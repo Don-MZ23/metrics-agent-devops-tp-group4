@@ -1,0 +1,20 @@
+# Dockerfile.dev
+FROM python:3.12-slim
+
+ENV PYTHONUNBUFFERED=1
+WORKDIR /app
+
+# Copié seul en premier -> Docker met cette couche en cache tant que
+# requirements.txt ne change pas (rebuilds plus rapides)
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Utilisateur non-root
+RUN useradd -m devuser
+USER devuser
+
+EXPOSE 8000
+
+# --reload = hot-reload : uvicorn permet de  relancer l'app dès qu'un fichier .py change
+# Fonctionne seulement si le code est monté en volume (voir compose.override plus tard)
+CMD ["uvicorn", "app.api:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
