@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
     image: metrics-agent:prod
-    container_name: metrics-api
+    container_name: metrics-agent-api
     ports:
       - "8000:8000"
     env_file:
@@ -12,28 +12,28 @@ services:
     networks:
       - metrics-net
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health').raise_for_status()"]
       interval: 30s
-      timeout: 3s
+      timeout: 5s
+      start_period: 10s
       retries: 3
-      start_period: 5s
+    restart: unless-stopped
 
   agent:
     build:
       context: .
       dockerfile: Dockerfile
     image: metrics-agent:prod
-    container_name: metrics-agent-worker
+    container_name: metrics-agent-collector
     command: ["python", "-m", "app.agent"]
     env_file:
       - .env
-    environment:
-      METRICS_ENDPOINT: http://api:8000/metrics
     depends_on:
       api:
         condition: service_healthy
     networks:
       - metrics-net
+    restart: unless-stopped
 
 networks:
   metrics-net:

@@ -22,6 +22,7 @@ Webhook externe.
 - Tests automatisés avec `pytest`.
 
 ## Architecture
+Le projet est composé de deux processus applicatifs distincts : 
 
 ```text
 system_metrics_agent/
@@ -76,6 +77,27 @@ cp .env.example .env
 ```
 
 Sous Windows, copier manuellement `.env.example` en `.env`.
+
+## Prérequis
+
+- Docker Engine + Docker Compose (v2)
+- Git
+- Un compte Docker Hub (pour récupérer les images publiées)
+
+## Lancer en développement
+
+Utilise Dockerfile.dev, avec hot-reload activé via un volume monté sur le code source.
+
+```bash
+docker build -f Dockerfile.dev -t metrics-agent:dev .
+
+docker run --rm -d -p 8000:8000 \
+  -v "$(pwd):/app" \
+  --env-file .env.example \
+  --name metrics-agent-dev \
+  metrics-agent:dev
+
+
 
 ## Démarrer l'API FastAPI
 

@@ -13,6 +13,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN useradd -m devuser
 USER devuser
 
+COPY --chown=devuser:devuser . .
+
 EXPOSE 8000
 
 # --reload = hot-reload : uvicorn permet de  relancer l'app dès qu'un fichier .py change
